@@ -1,7 +1,7 @@
 import random
 import asyncio
 from fastapi import APIRouter, WebSocket, Depends, HTTPException
-from app.services.auth_service import get_current_user
+from .services.auth_service import get_current_user
 
 router = APIRouter()
 

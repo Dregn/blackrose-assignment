@@ -5,8 +5,8 @@ Handles user login and session token generation.
 import  os
 from fastapi import APIRouter, Depends,HTTPException
 from fastapi.responses import JSONResponse
-from app.models.auth import LoginRequest, TokenResponse
-from app.services.auth_service import authenticate_user, create_access_token,create_refresh_token,verify_token
+from .models.auth import LoginRequest, TokenResponse
+from .services.auth_service import authenticate_user, create_access_token,create_refresh_token,verify_token
 
 router = APIRouter()
 REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY", "your_refresh_secret_key")

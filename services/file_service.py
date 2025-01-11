@@ -4,7 +4,7 @@ Includes error handling and file backup functionality.
 """
 
 import pandas as pd
-from app.utils.lock import lock_file
+from .utils.lock import lock_file
 import shutil
 import os
 

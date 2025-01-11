@@ -5,9 +5,9 @@ Includes error handling and backup management.
 import os
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
-from app.models.random_number import RandomRecord
-from app.services.file_service import read_csv, write_to_csv, delete_from_csv, create_backup
-from app.services.auth_service import get_current_user
+from .models.random_number import RandomRecord
+from .services.file_service import read_csv, write_to_csv, delete_from_csv, create_backup
+from .services.auth_service import get_current_user
 
 router = APIRouter()
 CSV_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../backend_table.csv"))
