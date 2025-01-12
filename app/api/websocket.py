@@ -10,7 +10,7 @@ active_connections = []
 
 
 @router.websocket("/ohlc-stream/")
-async def websocket_ohlc_stream(websocket: WebSocket,username=Depends(get_current_user)):
+async def websocket_ohlc_stream(websocket: WebSocket):
     """
     Streams random OHLC data continuously for WebSocket clients.
     """
