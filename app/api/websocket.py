@@ -1,23 +1,60 @@
 import random
 import asyncio
-from fastapi import APIRouter, WebSocket, Depends, HTTPException
-from app.services.auth_service import get_current_user
+from socketio import AsyncServer, ASGIApp
+from app.services.auth_service import get_current_user  # Import your validation logic
 
-router = APIRouter()
+# Initialize the Socket.IO server
+sio = AsyncServer(async_mode="asgi")
 
-MAX_CONNECTIONS = 100
-active_connections = []
-
-
-@router.websocket("/ohlc-stream/")
-async def websocket_ohlc_stream(websocket: WebSocket):
+@sio.event
+async def connect(sid, environ):
     """
-    Streams random OHLC data continuously for WebSocket clients.
+    Handles a new client connection and validates the Bearer token using the imported function.
     """
-    await websocket.accept()
+    headers = dict(environ["asgi.scope"].get("headers", []))
+    auth_header = headers.get(b'authorization')
+
+    if not auth_header:
+        print(f"Missing authorization header for SID: {sid}")
+        return False  # Deny the connection
 
     try:
-        print("New connection established.")
+        # Extract the token from the Authorization header
+        token = auth_header.decode()
+        print(f"Token received: {token}")
+
+        # Use the imported function for validation
+        user = get_current_user(token)
+        print(f"Connection authorized for user: {user}")
+
+        # Save user details in the session (await required)
+        await sio.save_session(sid, {"user": user})
+        return True  # Allow the connection
+
+    except Exception as e:
+        print(f"Authorization failed for SID: {sid}, Error: {e}")
+        return False  # Deny the connection
+
+
+@sio.event
+async def disconnect(sid):
+    """
+    Handles a client disconnecting.
+    """
+    print(f"Client disconnected: {sid}")
+
+
+@sio.on("ohlc-stream")
+async def ohlc_stream(sid, data):
+    """
+    Streams random OHLC data to the client.
+    """
+    try:
+        # Retrieve user details from the session (await required)
+        session = await sio.get_session(sid)
+        user = session.get("user")
+        print(f"Streaming OHLC data for user: {user}")
+
         current_price = random.uniform(100, 200)
 
         while True:
@@ -34,11 +71,13 @@ async def websocket_ohlc_stream(websocket: WebSocket):
                 "close": round(close_price, 2),
             }
 
-            await websocket.send_json(ohlc_data)
+            # Emit OHLC data to the client
+            await sio.emit("ohlc-data", ohlc_data, room=sid)
             await asyncio.sleep(1)
 
     except Exception as e:
-        print(f"Error in WebSocket connection: {e}")
-    finally:
-        print("WebSocket connection closed.")
-        await websocket.close()
+        print(f"Error in OHLC stream for SID: {sid}, Error: {e}")
+
+
+# Export the ASGI app
+socket_app = ASGIApp(sio)

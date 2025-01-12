@@ -79,7 +79,7 @@ def get_current_user(authorization: str = Header(None)):
 
         # Debug: Print the payload for troubleshooting
         print("Decoded JWT Payload:", payload)
-
+        print(type(payload))
         # Validate the 'sub' claim
         username = payload.get("sub")
         if not username:
