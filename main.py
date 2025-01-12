@@ -8,8 +8,19 @@ from app.api import auth, record, websocket
 from app.db.base import init_db
 import asyncio
 from app.services.random_gen_service import start_random_generator
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Enterprise-Grade Full-Stack Backend", version="1.0.0")
+# Initialize the FastAPI app
+app = FastAPI(title="Black Rose Assignment", version="1.0.0")
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost", "http://localhost:3000"],  # Allowed origins
+    allow_credentials=True,  # Allow cookies and authentication headers
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Initialize the database on application startup
 @app.on_event("startup")
