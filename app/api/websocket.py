@@ -1,33 +1,33 @@
 import random
 import asyncio
 from socketio import AsyncServer, ASGIApp
-from app.services.auth_service import get_current_user  # Import your validation logic
+from app.services.auth_service import get_current_user  # Token validation function
 
 # Initialize the Socket.IO server
-sio = AsyncServer(async_mode="asgi")
+sio = AsyncServer(async_mode="asgi", cors_allowed_origins=["http://localhost", "http://localhost:3000"])
 
 @sio.event
 async def connect(sid, environ):
     """
-    Handles a new client connection and validates the Bearer token using the imported function.
+    Handles a new client connection and validates the Bearer token.
     """
     headers = dict(environ["asgi.scope"].get("headers", []))
-    auth_header = headers.get(b'authorization')
+    auth_header = dict(headers).get(b'authorization')
 
     if not auth_header:
         print(f"Missing authorization header for SID: {sid}")
         return False  # Deny the connection
 
     try:
-        # Extract the token from the Authorization header
+        # Decode the token from the Authorization header
         token = auth_header.decode()
         print(f"Token received: {token}")
 
-        # Use the imported function for validation
+        # Validate the token
         user = get_current_user(token)
         print(f"Connection authorized for user: {user}")
 
-        # Save user details in the session (await required)
+        # Save user details in the session
         await sio.save_session(sid, {"user": user})
         return True  # Allow the connection
 
@@ -35,14 +35,12 @@ async def connect(sid, environ):
         print(f"Authorization failed for SID: {sid}, Error: {e}")
         return False  # Deny the connection
 
-
 @sio.event
 async def disconnect(sid):
     """
-    Handles a client disconnecting.
+    Handles client disconnection.
     """
     print(f"Client disconnected: {sid}")
-
 
 @sio.on("ohlc-stream")
 async def ohlc_stream(sid, data):
@@ -50,7 +48,7 @@ async def ohlc_stream(sid, data):
     Streams random OHLC data to the client.
     """
     try:
-        # Retrieve user details from the session (await required)
+        # Retrieve user details from the session
         session = await sio.get_session(sid)
         user = session.get("user")
         print(f"Streaming OHLC data for user: {user}")
@@ -78,6 +76,5 @@ async def ohlc_stream(sid, data):
     except Exception as e:
         print(f"Error in OHLC stream for SID: {sid}, Error: {e}")
 
-
-# Export the ASGI app
+# Export the ASGI app for the Socket.IO server
 socket_app = ASGIApp(sio)
