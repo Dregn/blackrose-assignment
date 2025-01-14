@@ -9,13 +9,13 @@ from app.db.base import init_db
 from app.services.random_gen_service import start_random_generator
 from app.api.websocket import sio  # Import Socket.IO server
 from fastapi.middleware.cors import CORSMiddleware
-from socketio import ASGIApp
+from socketio import ASGIApp, AsyncServer
 import asyncio
 
 # Initialize FastAPI
 app = FastAPI(title="Black Rose Assignment", version="1.0.0")
 
-# Configure CORS
+# Configure CORS for FastAPI
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost", "http://localhost:3000"],  # Allow localhost origins
@@ -24,8 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Allow localhost in Socket.IO
-sio = sio.AsyncServer(cors_allowed_origins=["http://localhost", "http://localhost:3000"])  # Configure CORS for Socket.IO
+# Initialize the Socket.IO AsyncServer with CORS configuration
+sio = AsyncServer(cors_allowed_origins=["http://localhost", "http://localhost:3000"])  # Allow CORS
 
 # Initialize database
 @app.on_event("startup")
