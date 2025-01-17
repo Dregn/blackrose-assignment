@@ -16,7 +16,7 @@ BACKUP_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "../backen
 def read_csv():
     """
     Reads all records from the CSV file and returns them as a list of dictionaries.
-    Ensures the file exists before reading and handles errors gracefully.
+    Ensures the file exists before reading and adds sequential IDs to rows without one.
     Returns:
         list: A list of dictionaries representing the records in the CSV file.
     """
@@ -24,8 +24,17 @@ def read_csv():
         # Ensure file exists before attempting to read
         if not os.path.exists(CSV_FILE):
             return []
+
         with lock_file(CSV_FILE):
             df = pd.read_csv(CSV_FILE)
+
+        # Add a sequential 'id' column if it doesn't exist
+        if "id" not in df.columns:
+            df["id"] = range(0, len(df))
+
+        # Ensure all rows have a valid sequential ID
+        df["id"] = pd.Series(range(0, len(df)))
+
         return df.to_dict(orient="records")
     except FileNotFoundError:
         return []
@@ -89,6 +98,42 @@ def delete_from_csv(record_id: int):
         raise ValueError("CSV file not found")
     except Exception as e:
         raise RuntimeError(f"Error deleting from CSV file: {e}")
+
+def update_csv_row(row_id: int, updated_record: dict):
+    """
+    Updates a specific row in the CSV file based on the row ID.
+    Ensures the record format matches the schema before updating.
+    
+    Args:
+        row_id (int): The ID of the row to update (zero-based index).
+        updated_record (dict): The updated record data.
+    """
+    try:
+        if not os.path.exists(CSV_FILE):
+            raise IndexError(f"CSV file not found. Cannot update row with ID {row_id}.")
+
+        with lock_file(CSV_FILE):
+            # Read the existing data
+            df = pd.read_csv(CSV_FILE)
+
+            # Check if the ID exists
+            if row_id < 0 or row_id >= len(df):
+                raise IndexError(f"Row ID {row_id} is out of bounds.")
+
+            # Validate column names and structure
+            if not all(col in df.columns for col in updated_record.keys()):
+                raise ValueError("Record structure does not match the existing CSV format")
+
+            # Update the specific row
+            for key, value in updated_record.items():
+                df.at[row_id, key] = value
+            print("writ to csv")
+            # Write the updated DataFrame back to the CSV file
+            df.to_csv(CSV_FILE, index=False)
+
+    except Exception as e:
+        print(f"Error updating CSV row: {e}")
+        raise RuntimeError(f"Error updating CSV row: {e}")
 
 
 def create_backup():

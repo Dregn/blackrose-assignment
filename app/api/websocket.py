@@ -1,6 +1,7 @@
 import random
 import asyncio
 from socketio import AsyncServer
+from datetime import datetime, timedelta
 from app.services.auth_service import get_current_user  # Import your token validation logic
 
 # Initialize the Socket.IO server
@@ -12,6 +13,7 @@ async def connect(sid, environ):
     Handles a new client connection and validates the Bearer token using the imported function.
     """
     headers = dict(environ["asgi.scope"].get("headers", []))
+    print(headers)
     auth_header = dict(headers).get(b"authorization")
 
     if not auth_header:
@@ -45,7 +47,7 @@ async def disconnect(sid):
 @sio.on("ohlc-stream")
 async def ohlc_stream(sid, data):
     """
-    Streams random OHLC data to the client.
+    Streams random OHLC data to the client with timestamps.
     """
     try:
         # Retrieve user details from the session
@@ -54,6 +56,8 @@ async def ohlc_stream(sid, data):
         print(f"Streaming OHLC data for user: {user}")
 
         current_price = random.uniform(100, 200)
+        start_date = datetime.now() + timedelta(days=11)  # Start date is current date + 11 days
+        current_date = start_date
 
         while True:
             open_price = current_price
@@ -63,6 +67,7 @@ async def ohlc_stream(sid, data):
             current_price = close_price
 
             ohlc_data = {
+                "time": current_date.strftime('%Y-%m-%d'),  # Add timestamp in 'YYYY-MM-DD' format
                 "open": round(open_price, 2),
                 "high": round(high_price, 2),
                 "low": round(low_price, 2),
@@ -71,7 +76,11 @@ async def ohlc_stream(sid, data):
 
             # Emit OHLC data to the client
             await sio.emit("ohlc-data", ohlc_data, room=sid)
-            await asyncio.sleep(1)
+            print(f"Emitting OHLC data: {ohlc_data}")  # Debugging log
+
+            # Increment the date by 1 day for the next data point
+            current_date += timedelta(days=1)
+            await asyncio.sleep(10)
 
     except Exception as e:
         print(f"Error in OHLC stream for SID: {sid}, Error: {e}")

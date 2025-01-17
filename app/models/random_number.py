@@ -6,7 +6,7 @@ Used for request validation and response formatting.
 from pydantic import BaseModel, Field, validator
 from typing import Literal,Optional
 
-class RandomRecord(BaseModel):
+class ExcelRecord(BaseModel):
     user: Optional[str] = Field(None, description="Username associated with the record")
     broker: str = Field(..., description="Broker name")
     API_key: str = Field(..., description="API key of the user", alias="API key")

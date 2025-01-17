@@ -5,8 +5,8 @@ Includes error handling and backup management.
 import os
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
-from app.models.random_number import RandomRecord
-from app.services.file_service import read_csv, write_to_csv, delete_from_csv, create_backup
+from app.models.random_number import ExcelRecord
+from app.services.file_service import read_csv, write_to_csv, delete_from_csv, create_backup,update_csv_row
 from app.services.auth_service import get_current_user
 
 router = APIRouter()
@@ -51,7 +51,7 @@ def download_csv(username=Depends(get_current_user)):
     )
 
 @router.post("/", summary="Add a new record for the current user")
-def add_record(record: RandomRecord, username: str = Depends(get_current_user)):
+def add_record(record: ExcelRecord, username: str = Depends(get_current_user)):
     print("hello")
     print("Endpoint hit: add_record")  # Debugging
     print(f"Username: {username}")  # Debugging
@@ -76,6 +76,36 @@ def add_record(record: RandomRecord, username: str = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail=f"Invalid record format: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error adding record: {e}")
+
+
+@router.put("/{id}/", summary="Update a record by ID")
+def update_record(
+    id: int,
+    updated_record: ExcelRecord,
+    username: str = Depends(get_current_user)
+):
+    print(f"Endpoint hit: update_record for ID: {id}")  # Debugging
+    print(f"Username: {username}")  # Debugging
+
+    try:
+        # Debugging: Print the record before processing
+
+
+        # Update the CSV row based on the ID
+        updated_record_dict = updated_record.dict(by_alias=True)
+        updated_record_dict["user"] = username
+
+        create_backup()
+        update_csv_row(id, updated_record_dict)
+
+        return {"message": f"Record with ID {id} updated successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid record format: {e}")
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail=f"Record with ID {id} not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating record: {e}")
+
 
 @router.delete("/{record_id}", summary="Delete a record from the CSV file")
 def delete_record(record_id: int, user=Depends(get_current_user)):
