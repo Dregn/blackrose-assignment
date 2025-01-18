@@ -56,7 +56,7 @@ async def ohlc_stream(sid, data):
         print(f"Streaming OHLC data for user: {user}")
 
         current_price = random.uniform(100, 200)
-        start_date = datetime.now() + timedelta(days=11)  # Start date is current date + 11 days
+        start_date = datetime.now() + timedelta(days=15)  # Start date is current date + 11 days
         current_date = start_date
 
         while True:
