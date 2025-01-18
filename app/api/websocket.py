@@ -65,6 +65,7 @@ async def ohlc_stream(sid, data):
             low_price = open_price - random.uniform(0.1, 5)
             close_price = random.uniform(low_price, high_price)
             current_price = close_price
+            print(current_date)
 
             ohlc_data = {
                 "time": current_date.strftime('%Y-%m-%d'),  # Add timestamp in 'YYYY-MM-DD' format
