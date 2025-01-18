@@ -18,10 +18,13 @@ fastapi_app = FastAPI(title="Black Rose Assignment", version="1.0.0")
 # Configure CORS for FastAPI
 fastapi_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://blackrose-frontend.pages.dev", "http://localhost:3000"],  # Allow localhost origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[
+        "https://blackrose-frontend.pages.dev",  # Production frontend
+        "http://localhost:3000"  # Local development frontend
+    ],
+    allow_credentials=True,  # Allow cookies/authorization headers
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Initialize database
