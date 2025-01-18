@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from app.services.auth_service import get_current_user  # Import your token validation logic
 
 # Initialize the Socket.IO server
-sio = AsyncServer(async_mode="asgi", cors_allowed_origins=["http://localhost", "http://localhost:3000"])
+sio = AsyncServer(async_mode="asgi", cors_allowed_origins=["https://blackrose-frontend.pages.dev", "http://localhost:3000"])
 
 @sio.event
 async def connect(sid, environ):
