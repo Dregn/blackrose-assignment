@@ -107,7 +107,7 @@ def update_record(
         raise HTTPException(status_code=500, detail=f"Error updating record: {e}")
 
 
-@router.delete("/{record_id}", summary="Delete a record from the CSV file")
+@router.delete("/{record_id}/", summary="Delete a record from the CSV file")
 def delete_record(record_id: int, user=Depends(get_current_user)):
     """
     Deletes a record from the CSV file by its index.
@@ -133,7 +133,7 @@ def delete_record(record_id: int, user=Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Error deleting record: {e}")
 
 # Fetch a specific record by ID
-@router.get("/{record_id}", summary="Fetch a specific record by its ID from the CSV file")
+@router.get("/{record_id}/", summary="Fetch a specific record by its ID from the CSV file")
 def fetch_record_by_id(record_id: int, user=Depends(get_current_user)):
     try:
         records = read_csv()
