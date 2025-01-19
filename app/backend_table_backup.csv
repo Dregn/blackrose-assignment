@@ -1,0 +1,17 @@
+user,broker,API key,API secret,pnl,margin,max_risk
+user_10,BrokerC,APIKEY_8492,APISECRET_68319,212.89,40958.06,5.69
+datta,BrokerA,APIKEY_1234,APISECRET_5678,500.0,20000.5,3.5
+datta,BrokerA,APIKEY_1234,APISECRET_5678,500.0,20000.5,3.5
+datta,BrokerK,APIKEY_1234,APISECRET_5678,500.0,20000.5,3.5
+datta,BrokerA,APIKEY_4,APISECRET_4,-4490.90449698653,20000.5,3.5
+datta,BrokerA,APIKEY_5,APISECRET_5,-3418.691843462975,20000.5,3.5
+datta,BrokerA,APIKEY_1,APISECRET_1,-2147.311576693384,20000.5,3.5
+datta,BrokerA,APIKEY_2,APISECRET_2,4820.148743206939,20000.5,3.5
+datta,BrokerK,APIKEY_1234,APISECRET_5678,500.0,20000.5,3.5
+datta,Brokeru,APIKEY_1234,APISECRET_5678,500.0,20000.5,3.5
+datta,kjhlkjh,saome key,slkj;ldskj,845.0,78.0,2.8
+datta,some broker,saome key,slkj;ldskj,845.0,78.0,2.8
+datta,kjhlkjh,saome key,slkj;ldskj,845.0,78.0,2.8
+datta,kjhlkjh,saome key,slkj;ldskj,845.0,7.0,2.8
+datta,somebroker,saome key,slkj;ldskj,845.0,78.0,2.8
+datta,somebroker,saome key,slkj;ldskj,845.0,78.0,2.8
